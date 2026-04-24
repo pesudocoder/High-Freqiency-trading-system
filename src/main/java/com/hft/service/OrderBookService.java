@@ -7,8 +7,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class OrderBookService {
-    // We instantiate exactly ONE thread-safe Matching Engine here
-    private final MatchingEngine engine = new MatchingEngine();
+
+    private final MatchingEngine engine;
+
+    public OrderBookService(MatchingEngine engine) {
+        this.engine = engine;
+    }
 
     public void processOrder(Order order) {
         engine.processOrder(order);

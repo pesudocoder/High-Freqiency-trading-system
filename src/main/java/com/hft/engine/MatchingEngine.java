@@ -7,16 +7,25 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.time.Instant;
 
+import com.hft.dto.TradeEvent;
+import com.hft.service.TradeBroadcaster;
+import org.springframework.stereotype.Component;
+
+@Component
 public class MatchingEngine {
     // Max-Heap for Bids (Buys): Highest price first
     private final PriorityQueue<Order> bids;
     // Min-Heap for Asks (Sells): Lowest price first
     private final PriorityQueue<Order> asks;
 
-    public MatchingEngine() {
+    private final TradeBroadcaster broadcaster;
+
+    public MatchingEngine(TradeBroadcaster broadcaster) {
         bids = new PriorityQueue<>(Comparator.comparingDouble(Order::price).reversed());
         asks = new PriorityQueue<>(Comparator.comparingDouble(Order::price));
+        this.broadcaster = broadcaster;
     }
 
     // Thread Safety: synchronized ensures only one HTTP request modifies the book at a time
@@ -30,6 +39,11 @@ public class MatchingEngine {
                 if (newOrder.price() >= bestAsk.price()) {
                     int matchQty = Math.min(remainingQuantity, bestAsk.quantity());
                     System.out.println("   [MATCH] Buy " + newOrder.id() + " matched with Sell " + bestAsk.id() + " for " + matchQty + " @ Rs " + bestAsk.price());
+                    
+                    broadcaster.broadcastTrade(new TradeEvent(
+                            newOrder.id(), bestAsk.id(), Side.BUY, bestAsk.price(), matchQty, Instant.now()
+                    ));
+
                     remainingQuantity -= matchQty;
 
                     if (matchQty == bestAsk.quantity()) {
@@ -51,6 +65,11 @@ public class MatchingEngine {
                 if (newOrder.price() <= bestBid.price()) {
                     int matchQty = Math.min(remainingQuantity, bestBid.quantity());
                     System.out.println("   [MATCH] Sell " + newOrder.id() + " matched with Buy " + bestBid.id() + " for " + matchQty + " @ Rs " + bestBid.price());
+                    
+                    broadcaster.broadcastTrade(new TradeEvent(
+                            newOrder.id(), bestBid.id(), Side.SELL, bestBid.price(), matchQty, Instant.now()
+                    ));
+
                     remainingQuantity -= matchQty;
 
                     if (matchQty == bestBid.quantity()) {
