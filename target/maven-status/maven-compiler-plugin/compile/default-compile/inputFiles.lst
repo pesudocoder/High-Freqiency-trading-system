@@ -5,6 +5,7 @@ C:\Users\Kevin Pereira\Documents\College Papers\projects\High Freqiency trading 
 C:\Users\Kevin Pereira\Documents\College Papers\projects\High Freqiency trading system\src\main\java\com\hft\exception\GlobalExceptionHandler.java
 C:\Users\Kevin Pereira\Documents\College Papers\projects\High Freqiency trading system\src\main\java\com\hft\service\TradeBroadcaster.java
 C:\Users\Kevin Pereira\Documents\College Papers\projects\High Freqiency trading system\src\main\java\com\hft\event\OrderMatched.java
+C:\Users\Kevin Pereira\Documents\College Papers\projects\High Freqiency trading system\src\main\java\com\hft\exception\DuplicateOrderException.java
 C:\Users\Kevin Pereira\Documents\College Papers\projects\High Freqiency trading system\src\main\java\com\hft\service\OrderBookService.java
 C:\Users\Kevin Pereira\Documents\College Papers\projects\High Freqiency trading system\src\main\java\com\hft\config\EngineRecoveryRunner.java
 C:\Users\Kevin Pereira\Documents\College Papers\projects\High Freqiency trading system\src\main\java\com\hft\HftApplication.java

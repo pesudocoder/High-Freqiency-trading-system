@@ -10,6 +10,7 @@ import java.util.PriorityQueue;
 import java.time.Instant;
 
 import com.hft.dto.TradeEvent;
+import com.hft.exception.DuplicateOrderException;
 import com.hft.service.TradeBroadcaster;
 import com.hft.store.JsonEventStore;
 import com.hft.event.DomainEvent;
@@ -34,6 +35,10 @@ public class MatchingEngine {
 
     public synchronized void processOrder(Order newOrder) {
         System.out.println("-> Incoming Command: " + newOrder.side() + " " + newOrder.quantity() + " @ Rs " + newOrder.price() + " (ID: " + newOrder.id() + ")");
+
+        if (orderExists(newOrder.id())) {
+            throw new DuplicateOrderException(newOrder.id());
+        }
 
         // 1. Generate Acceptance Event & Persist
         OrderAccepted accepted = new OrderAccepted(newOrder, Instant.now());
@@ -105,11 +110,22 @@ public class MatchingEngine {
             }
         } 
         else if (event instanceof OrderMatched matched) {
-            reduceOrderQuantity(bids, matched.initiatorId(), matched.quantity());
-            reduceOrderQuantity(asks, matched.initiatorId(), matched.quantity());
-            reduceOrderQuantity(bids, matched.targetId(), matched.quantity());
-            reduceOrderQuantity(asks, matched.targetId(), matched.quantity());
+            // matched.side() is the initiator's side: BUY orders rest in bids, SELL orders rest in asks.
+            PriorityQueue<Order> initiatorQueue = matched.side() == Side.BUY ? bids : asks;
+            PriorityQueue<Order> targetQueue = matched.side() == Side.BUY ? asks : bids;
+            reduceOrderQuantity(initiatorQueue, matched.initiatorId(), matched.quantity());
+            reduceOrderQuantity(targetQueue, matched.targetId(), matched.quantity());
         }
+    }
+
+    private boolean orderExists(String orderId) {
+        for (Order o : bids) {
+            if (o.id().equals(orderId)) return true;
+        }
+        for (Order o : asks) {
+            if (o.id().equals(orderId)) return true;
+        }
+        return false;
     }
 
     private void reduceOrderQuantity(PriorityQueue<Order> queue, String orderId, int matchedQty) {

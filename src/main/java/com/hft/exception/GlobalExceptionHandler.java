@@ -2,6 +2,7 @@ package com.hft.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,6 +24,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
     
+    // Handles malformed JSON bodies (e.g. an invalid Side value like "WRONG")
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> handleMalformedJson(HttpMessageNotReadableException ex) {
+        return new ResponseEntity<>("Malformed request body: " + ex.getMostSpecificCause().getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    // Handles submitting an order ID that already exists in the book
+    @ExceptionHandler(DuplicateOrderException.class)
+    public ResponseEntity<String> handleDuplicateOrder(DuplicateOrderException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
     // Fallback for everything else
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneralException(Exception ex) {

@@ -1,7 +1,13 @@
+import sys
 import requests
 import concurrent.futures
 import time
 import random
+
+# Windows consoles default to a codepage (e.g. cp1252) that can't encode the
+# checkmark characters below, which crashed the audit summary print with a
+# UnicodeEncodeError. Force UTF-8 so the script runs the same on every OS.
+sys.stdout.reconfigure(encoding='utf-8')
 
 API_URL = "http://localhost:8080/api/orders"
 BOOK_URL = "http://localhost:8080/api/book"

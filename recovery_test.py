@@ -2,6 +2,10 @@ import requests
 import time
 import sys
 
+# Windows consoles default to a codepage (e.g. cp1252) that can't encode the
+# emoji/checkmark characters below; force UTF-8 so the script runs the same on every OS.
+sys.stdout.reconfigure(encoding='utf-8')
+
 API_URL = "http://localhost:8080/api/orders"
 BOOK_URL = "http://localhost:8080/api/book"
 

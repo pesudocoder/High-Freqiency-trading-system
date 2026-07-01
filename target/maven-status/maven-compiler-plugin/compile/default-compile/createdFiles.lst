@@ -1,6 +1,7 @@
 com\hft\dto\OrderBookResponse.class
 com\hft\event\OrderAccepted.class
 com\hft\engine\MatchingEngine.class
+com\hft\exception\DuplicateOrderException.class
 com\hft\event\OrderCancelled.class
 com\hft\model\Side.class
 com\hft\event\DomainEvent.class
