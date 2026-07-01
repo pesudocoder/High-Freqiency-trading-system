@@ -10,9 +10,12 @@ com\hft\service\OrderBookService.class
 com\hft\dto\OrderRequest.class
 com\hft\model\Order.class
 com\hft\store\JsonEventStore.class
+com\hft\service\DepthBroadcaster.class
 com\hft\config\WebSocketConfig.class
 com\hft\controller\OrderController.class
 com\hft\event\OrderMatched.class
+com\hft\dto\MarketDepthSnapshotDTO.class
 com\hft\config\EngineRecoveryRunner.class
 com\hft\dto\TradeEvent.class
 com\hft\HftApplication.class
+com\hft\dto\DepthLevel.class

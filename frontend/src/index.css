@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+body {
+  background-color: #0f172a; /* Slate 900 for dark mode */
+  color: #f1f5f9; /* Slate 100 for default text */
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-y: hidden;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}

@@ -15,10 +15,13 @@ import com.hft.store.JsonEventStore;
 import com.hft.event.DomainEvent;
 import com.hft.event.OrderAccepted;
 import com.hft.event.OrderMatched;
+import com.hft.dto.MarketDepthSnapshotDTO;
+import com.hft.dto.DepthLevel;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MatchingEngine {
+
     private final PriorityQueue<Order> bids;
     private final PriorityQueue<Order> asks;
 
@@ -155,5 +158,40 @@ public class MatchingEngine {
             sortedAsks.add(copy.poll());
         }
         return sortedAsks;
+    }
+
+    public synchronized MarketDepthSnapshotDTO generateDepthSnapshot() {
+        return new MarketDepthSnapshotDTO(
+                aggregateLevels(new PriorityQueue<>(bids), 10),
+                aggregateLevels(new PriorityQueue<>(asks), 10)
+        );
+    }
+
+    private List<DepthLevel> aggregateLevels(PriorityQueue<Order> queueCopy, int maxLevels) {
+        List<DepthLevel> levels = new ArrayList<>();
+        if (queueCopy.isEmpty()) return levels;
+
+        double currentPrice = queueCopy.peek().price();
+        int currentQty = 0;
+
+        while (!queueCopy.isEmpty()) {
+            Order order = queueCopy.poll();
+            if (Double.compare(order.price(), currentPrice) == 0) {
+                currentQty += order.quantity();
+            } else {
+                levels.add(new DepthLevel(currentPrice, currentQty));
+                if (levels.size() >= maxLevels) {
+                    return levels;
+                }
+                currentPrice = order.price();
+                currentQty = order.quantity();
+            }
+        }
+        // Add the very last evaluated level
+        if (levels.size() < maxLevels) {
+            levels.add(new DepthLevel(currentPrice, currentQty));
+        }
+
+        return levels;
     }
 }
